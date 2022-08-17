@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Get all candidates
-app.get('/', (req, res) => {
+app.get('/api/candidate(s)?', (req, res) => {
 	db.query(`SELECT * FROM candidates`, (err, rows) => {
 		if (err) {
 			res.status(500).json({ error: err.message })
@@ -34,6 +34,22 @@ app.get('/', (req, res) => {
 	})
 })
 
+// Get single candidate
+app.get('/api/candidate/:id', (req, res) => {
+	const query = `SELECT * FROM candidates WHERE id = ?`
+	const id = req.params.id 
+
+	db.query(query, id, (err, row) => {
+		if (err) {
+			res.status(400).json({ error : err.message })
+			return
+		}
+		res.json({
+			message: 'Success',
+			data: row
+		})
+	})
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
