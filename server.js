@@ -1,16 +1,27 @@
 const express = require('express')
 const createError = require('http-errors')
+const mysql = require('mysql2')
+require('dotenv').config();
 
 const PORT = process.env.port || 3001
 const app = express()
 
+//db connection
+const db = mysql.createConnection(
+	{
+		host: 'localhost',
+		user: 'root',
+		password: process.env.password,
+		database: 'election'
+	},
+	console.log('Connected to election database.')
+)
+
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
-app.get('/', (req, res) => {
-	res.json({
-		message: 'Hello World'
-	})
+db.query(`SELECT * FROM candidates`, (err, rows) => {
+	console.log(rows)
 })
 
 // catch 404 and forward to error handler
