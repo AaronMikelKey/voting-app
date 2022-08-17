@@ -20,9 +20,20 @@ const db = mysql.createConnection(
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
-db.query(`SELECT * FROM candidates`, (err, rows) => {
-	console.log(rows)
+// Get all candidates
+app.get('/', (req, res) => {
+	db.query(`SELECT * FROM candidates`, (err, rows) => {
+		if (err) {
+			res.status(500).json({ error: err.message })
+			return
+	}
+		res.json({
+			message: 'Success',
+			data: rows
+		})
+	})
 })
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
