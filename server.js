@@ -1,7 +1,8 @@
 const express = require('express')
 const createError = require('http-errors')
 const mysql = require('mysql2')
-require('dotenv').config();
+require('dotenv').config()
+const inputCheck = require('./utils/inputCheck')
 
 const PORT = process.env.port || 3001
 const app = express()
@@ -76,6 +77,30 @@ app.delete('/api/candidate/:id', (req, res) => {
     }
   });
 });
+
+app.post('/api/candidate', ({ body }, res) => {
+	const errors = inputCheck(body, 'first_name', 'last_name', 'industry_connected')
+	if (errors) {
+		res.status(400).json({ error: errors })
+		return
+	}
+
+	const query = `INSERT INTO candidates (first_name, last_name, industry_connected)
+	VALUES (?,?,?)`;
+
+	const params = [body.first_name, body.last_name, body.industry_connected]
+
+	db.query(query, params, (err, result) => {
+		if (err) {
+			res.status(400).json({ error: err.message })
+			return
+		}
+		res.json({
+			message: 'Success',
+			data: body
+		})
+	})
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
