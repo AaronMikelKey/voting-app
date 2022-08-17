@@ -43,6 +43,10 @@ app.get('/api/candidate/:id', (req, res) => {
 		if (err) {
 			res.status(400).json({ error : err.message })
 			return
+		} else if (row = '[]') {
+			res.json({
+				message: 'No candidate with that ID, please try another or add a candidate with that ID.'
+			})
 		}
 		res.json({
 			message: 'Success',
@@ -50,6 +54,28 @@ app.get('/api/candidate/:id', (req, res) => {
 		})
 	})
 })
+
+// Delete a candidate
+app.delete('/api/candidate/:id', (req, res) => {
+  const query = `DELETE FROM candidates WHERE id = ?`;
+  const id = [req.params.id];
+
+  db.query(query, id, (err, result) => {
+    if (err) {
+      res.statusMessage(400).json({ error: res.message });
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Candidate not found'
+      });
+    } else {
+      res.json({
+        message: 'deleted',
+        changes: result.affectedRows,
+        id: req.params.id
+      });
+    }
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
